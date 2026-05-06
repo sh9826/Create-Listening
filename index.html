@@ -143,10 +143,22 @@ body{font-family:'Noto Sans KR',sans-serif; padding:30px; font-size:14pt;}
 }
 
 function downloadDocx(){
-const content=makeHtml();
-const converted=htmlDocx.asBlob(content);
-const filename=(document.getElementById('title').value || '대화문 생성기') + '.docx';
-saveAs(converted, filename);
+const content = makeHtml();
+const blob = new Blob(
+['\ufeff', content],
+{ type: 'application/msword' }
+);
+
+const link = document.createElement('a');
+link.href = URL.createObjectURL(blob);
+
+const filename =
+(document.getElementById('title').value || '대화문 생성기') + '.doc';
+
+link.download = filename;
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
 }
 </script>
 
