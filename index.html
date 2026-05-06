@@ -124,6 +124,26 @@ return html;
 }).join('');
 }
 
+function chineseWritingBlock(text){
+return text.split('\n').map(line=>{
+if(!line.trim()) return '';
+
+let parts = line.split('\t');
+
+let speaker = parts[0] ? parts[0].trim() : '';
+let cn = parts[2] ? parts[2].trim() : '';
+
+if(!cn) return '';
+
+return `
+<div style="margin-bottom:12px;">
+<div><b>${speaker}:</b> ${cn}</div>
+<div>______________________________</div>
+</div>
+`;
+}).join('');
+}
+  
 function makeHtml(){
 
 const title = document.getElementById('title').value || '대화문 생성기';
@@ -149,7 +169,7 @@ q2 =
 <h3>2. 들은 대화문의 표현과 구조를 참고하여 아래 중국어 대화를 한국어로 쓰세요。</h3>
 <p>请参考刚才听到的对话中的表达和句型把下面的中文对话写成韩语。</p>
 
-${lines(t2,'q')}
+${chineseWritingBlock(t2)}
 `;
 }else{
 q2 =
@@ -191,14 +211,14 @@ return `
 <style>
 body{
 font-family:'Noto Sans KR',sans-serif;
-padding:20mm;
-font-size:13pt;
-line-height:1.6;
+padding:1.27cm;
+font-size:10pt;
+line-height:1.5;
 }
 
 @page{
 size:A4;
-margin:15mm;
+margin:1.27cm;
 }
 </style>
 </head>
