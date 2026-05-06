@@ -124,29 +124,65 @@ return html;
 }
 
 function makeHtml(){
-const title=document.getElementById('title').value || '대화문 생성기';
-const level=document.getElementById('level').value;
-const t1=document.getElementById('text1').value;
-const t2=document.getElementById('text2').value;
 
-let body = `
-<h2>${title}</h2>
-<p>1. 대화문을 듣고 빈칸에 알맞은 말을 쓰세요.</p>
-<h3>1번 문제</h3>
+const title = document.getElementById('title').value || '대화문 생성기';
+const level = document.getElementById('level').value;
+
+const t1 = document.getElementById('text1').value;
+const t2 = document.getElementById('text2').value;
+
+// 문제 1 (초급/중급 공통)
+let q1 =
+`<h2>${title}</h2>
+<h3>1. 대화문을 듣고 빈칸에 알맞은 말을 쓰세요.</h3>
+<p>请听对话并填写空格。</p>
 ${lines(t1,'q')}
 `;
 
-if(level==='초급'){
-body += `<br><br><h3>2번 문제</h3>${lines(t2,'q')}`;
+// 초급이면 문제 2 추가
+let q2 = '';
+
+if(level === '초급'){
+q2 =
+`<br><br>
+<h3>2. 들은 대화문의 표현과 구조를 참고하여,<br>
+아래 중국어 대화를 한국어로 쓰세요。</h3>
+<p>请参考刚才听到的对话中的表达和句型，<br>
+把下面的中文对话写成韩语。</p>
+
+${lines(t2,'q')}
+`;
+}else{
+q2 =
+`<br><br>
+<h3>2. 방금 들은 대화문처럼 새로운 대화문을 만들어 보세요。</h3>
+<p>请参考刚才听到的对话，编写一个新的对话。</p>
+
+${lines(t1,'q')}
+`;
 }
 
-body += `<div style="page-break-before:always;"></div>
-<h2>1번 답지</h2>
+// 답지 (한국어만)
+let a1 =
+`<h2>답지</h2>
+<h3>1번 정답</h3>
 ${lines(t1,'a')}
 `;
 
-if(level==='초급'){
-body += `<br><br><h2>2번 답지</h2>${lines(t2,'a')}`;
+let a2 = '';
+
+if(level === '초급'){
+a2 =
+`<br><br>
+<h3>2번 정답</h3>
+${lines(t2,'a')}
+`;
+}else{
+a2 =
+`<br><br>
+<h3>2번 정답</h3>
+${lines(t1,'a')}
+`;
 }
 
 return `
@@ -154,12 +190,25 @@ return `
 <head>
 <meta charset="UTF-8">
 <style>
-body{font-family:'Noto Sans KR',sans-serif; padding:30px; font-size:14pt;}
+body{
+font-family:'Noto Sans KR',sans-serif;
+padding:30px;
+font-size:14pt;
+}
+h2{text-align:center;}
+h3{margin-top:20px;}
 .line{margin-bottom:16px; line-height:1.8;}
 .red{color:red; font-weight:bold;}
 </style>
 </head>
-<body>${body}</body></html>
+<body>
+${q1}
+${q2}
+<div style="page-break-before:always;"></div>
+${a1}
+${a2}
+</body>
+</html>
 `;
 }
 
