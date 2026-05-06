@@ -1,71 +1,139 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>대화문 생성기</title>
-  <style>
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 40px;
-    }
-    .box {
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    h1 {
-      margin-top: 0;
-    }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      font-size: 16px;
-    }
-    textarea {
-      height: 220px;
-      resize: vertical;
-    }
-    button {
-      background: #111827;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    button:hover {
-      opacity: 0.9;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>대화문 생성기</title>
+
+<style>
+body{
+font-family:'Noto Sans KR',sans-serif;
+background:#f5f5f5;
+padding:40px;
+margin:0;
+}
+.wrap{
+max-width:1000px;
+margin:auto;
+background:#fff;
+padding:30px;
+border-radius:14px;
+box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+h1{margin-top:0;}
+input,textarea,select{
+width:100%;
+padding:12px;
+margin-top:8px;
+margin-bottom:18px;
+border:1px solid #ddd;
+border-radius:8px;
+font-size:16px;
+box-sizing:border-box;
+}
+textarea{
+height:280px;
+resize:vertical;
+}
+button{
+padding:12px 20px;
+border:none;
+background:#111;
+color:#fff;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+margin-right:10px;
+}
+button:hover{opacity:.9;}
+#preview{
+margin-top:30px;
+padding:20px;
+border:1px solid #ddd;
+background:#fff;
+}
+.page{
+page-break-after:always;
+padding-bottom:30px;
+}
+.line{
+margin-bottom:18px;
+line-height:1.9;
+}
+@media print{
+button,.noprint{display:none;}
+body{background:#fff;padding:0;}
+.wrap{box-shadow:none;}
+}
+</style>
 </head>
+
 <body>
-  <div class="box">
-    <h1>대화문 생성기</h1>
+<div class="wrap">
 
-    <label>제목</label>
-    <input type="text" placeholder="예: 초급1 - 5과 익힘책 듣기 연습 문제2">
+<h1>대화문 생성기</h1>
 
-    <label>유형 선택</label>
-    <select>
-      <option>초급</option>
-      <option>중급</option>
-    </select>
+<label>제목</label>
+<input id="title" placeholder="예: 초급1 - 5과 익힘책 듣기 연습 문제2">
 
-    <label>대화문 입력</label>
-    <textarea placeholder="예: 안젤라: (다음주 금요일이) 생일이에요?"></textarea>
+<label>유형</label>
+<select id="level">
+<option>초급</option>
+<option>중급</option>
+</select>
 
-    <button>워드 다운로드</button>
-  </div>
+<label>대화문 입력</label>
+<textarea id="text" placeholder="예:
+안젤라: (다음주 금요일이) 제이슨 씨 생일이에요?
+제이슨: (아니에요). 제 생일은 (7월이에요)."></textarea>
+
+<button onclick="makeDoc()">문제지 생성</button>
+<button onclick="window.print()">워드/PDF 저장</button>
+
+<div id="preview"></div>
+
+</div>
+
+<script>
+function blankify(text){
+return text.replace(/\((.*?)\)/g,function(match,p1){
+return '__________';
+});
+}
+
+function answerify(text){
+return text.replace(/\((.*?)\)/g,'$1');
+}
+
+function linesToHtml(text){
+return text.split('\n').map(line=>{
+if(line.trim()==='') return '<br>';
+return '<div class=\"line\">'+line+'</div>';
+}).join('');
+}
+
+function makeDoc(){
+const title=document.getElementById('title').value || '대화문 생성기';
+const raw=document.getElementById('text').value;
+
+const question=blankify(raw);
+const answer=answerify(raw);
+
+document.getElementById('preview').innerHTML=
+`
+<div class="page">
+<h2>${title}</h2>
+<p>1. 대화문을 듣고 빈칸에 알맞은 말을 쓰세요.</p>
+${linesToHtml(question)}
+</div>
+
+<div class="page">
+<h2>답지</h2>
+${linesToHtml(answer)}
+</div>
+`;
+}
+</script>
+
 </body>
 </html>
