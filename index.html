@@ -104,18 +104,19 @@ return text.split('\n').map(line=>{
 
 if(line.trim()==='') return '<br>';
 
-let parts = line.split('|');
+let parts = line.split('\t');
 
-let ko = parts[0].trim();
-let cn = parts[1] ? parts[1].trim() : '';
+let ko = parts[1] ? parts[1].trim() : parts[0].trim();
 
-let result =
-(mode==='q') ? blankify(ko) : answerify(ko);
+let cn = parts[2] ? parts[2].trim() : '';
 
-let html = '<div class=\"line\">'+result+'</div>';
+let result = (mode==='q') ? blankify(ko) : answerify(ko);
 
-if(cn){
-html += '<div class=\"line\" style=\"color:#666;font-size:12pt;margin-top:-10px;\">'+cn+'</div>';
+let html = '<div class="line">'+result+'</div>';
+
+// 문제지에서만 중국어 표시
+if(mode==='q' && cn){
+html += '<div class="line" style="color:#666;font-size:12pt;margin-top:-8px;">'+cn+'</div>';
 }
 
 return html;
@@ -150,7 +151,9 @@ q2 =
 <p>请参考刚才听到的对话中的表达和句型，<br>
 把下面的中文对话写成韩语。</p>
 
-${lines(t2,'q')}
+${lines(t2,'q')}<br>
+<div style="margin-top:10px;">____________________________</div>
+<div style="margin-top:10px;">____________________________</div>
 `;
 }else{
 q2 =
@@ -192,13 +195,15 @@ return `
 <style>
 body{
 font-family:'Noto Sans KR',sans-serif;
-padding:30px;
-font-size:14pt;
+padding:20mm;
+font-size:13pt;
+line-height:1.6;
 }
-h2{text-align:center;}
-h3{margin-top:20px;}
-.line{margin-bottom:16px; line-height:1.8;}
-.red{color:red; font-weight:bold;}
+
+@page{
+size:A4;
+margin:15mm;
+}
 </style>
 </head>
 <body>
