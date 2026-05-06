@@ -89,7 +89,10 @@ document.getElementById('box2').style.display =
 toggleFields();
 
 function blankify(text){
-return text.replace(/\((.*?)\)/g,'__________');
+return text.replace(/\((.*?)\)/g,function(match,p1){
+let len = p1.length;
+return '_'.repeat(Math.max(len + 2,5));
+});
 }
 
 function answerify(text){
@@ -97,9 +100,26 @@ return text.replace(/\((.*?)\)/g,'<span class=\"red\">$1</span>');
 }
 
 function lines(text,mode){
-return text.split('\\n').map(line=>{
+return text.split('\n').map(line=>{
+
 if(line.trim()==='') return '<br>';
-return '<div class=\"line\">'+(mode==='q'?blankify(line):answerify(line))+'</div>';
+
+let parts = line.split('|');
+
+let ko = parts[0].trim();
+let cn = parts[1] ? parts[1].trim() : '';
+
+let result =
+(mode==='q') ? blankify(ko) : answerify(ko);
+
+let html = '<div class=\"line\">'+result+'</div>';
+
+if(cn){
+html += '<div class=\"line\" style=\"color:#666;font-size:12pt;margin-top:-10px;\">'+cn+'</div>';
+}
+
+return html;
+
 }).join('');
 }
 
@@ -112,20 +132,21 @@ const t2=document.getElementById('text2').value;
 let body = `
 <h2>${title}</h2>
 <p>1. 대화문을 듣고 빈칸에 알맞은 말을 쓰세요.</p>
+<h3>1번 문제</h3>
 ${lines(t1,'q')}
 `;
 
 if(level==='초급'){
-body += `<br><br>${lines(t2,'q')}`;
+body += `<br><br><h3>2번 문제</h3>${lines(t2,'q')}`;
 }
 
 body += `<div style="page-break-before:always;"></div>
-<h2>답지</h2>
+<h2>1번 답지</h2>
 ${lines(t1,'a')}
 `;
 
 if(level==='초급'){
-body += `<br><br>${lines(t2,'a')}`;
+body += `<br><br><h2>2번 답지</h2>${lines(t2,'a')}`;
 }
 
 return `
