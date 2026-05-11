@@ -72,7 +72,24 @@ A2: level==='beginner'
 : ''
 });
 
+try{
 doc.render();
+}catch(error){
+
+console.log(error);
+
+if(error.properties && error.properties.errors){
+let msg = error.properties.errors
+.map(e => e.properties.explanation)
+.join('\n');
+
+alert('템플릿 오류:\n' + msg);
+}else{
+alert('오류 발생');
+}
+
+return;
+}
 
 const out = doc.getZip().generate({
 type:'blob',
