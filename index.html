@@ -5,28 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>대화문 생성기</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-
 <style>
 body{
 font-family:'Noto Sans KR',sans-serif;
 background:#f4f4f4;
-padding:40px;
 margin:0;
+padding:40px;
 }
 .wrap{
-max-width:1000px;
+max-width:900px;
 margin:auto;
 background:#fff;
 padding:30px;
 border-radius:14px;
 box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
-input,textarea,select{
+h1{margin-top:0;}
+input,select,textarea{
 width:100%;
 padding:12px;
-margin:8px 0 18px;
+margin-top:8px;
+margin-bottom:18px;
 border:1px solid #ddd;
 border-radius:8px;
 font-size:16px;
@@ -37,18 +36,15 @@ height:220px;
 resize:vertical;
 }
 button{
-padding:12px 18px;
+padding:14px 18px;
 border:none;
 background:#111;
 color:#fff;
 border-radius:8px;
 cursor:pointer;
-margin-right:8px;
+font-size:16px;
 }
 button:hover{opacity:.9;}
-.line{margin-bottom:16px; line-height:1.8;}
-.red{color:red; font-weight:bold;}
-.hidden{display:none;}
 </style>
 </head>
 
@@ -58,200 +54,24 @@ button:hover{opacity:.9;}
 <h1>대화문 생성기</h1>
 
 <label>제목</label>
-<input id="title" placeholder="예: 초급1 - 5과 익힘책 듣기 연습 문제2">
+<input id="title">
 
 <label>유형</label>
-<select id="level" onchange="toggleFields()">
-<option value="초급">초급</option>
-<option value="중급">중급</option>
+<select id="level">
+<option value="beginner">초급</option>
+<option value="intermediate">중급</option>
 </select>
 
-<div id="box1">
 <label>대화문 1</label>
 <textarea id="text1"></textarea>
-</div>
 
-<div id="box2">
-<label>대화문 2</label>
+<label>대화문 2 (초급만 사용)</label>
 <textarea id="text2"></textarea>
+
+<button onclick="generate()">워드 다운로드</button>
+
 </div>
 
-<button onclick="downloadDocx()">워드 다운로드</button>
-
-</div>
-
-<script>
-function toggleFields(){
-const level=document.getElementById('level').value;
-document.getElementById('box2').style.display =
-(level==='초급') ? 'block' : 'none';
-}
-toggleFields();
-
-function blankify(text){
-return text.replace(/\((.*?)\)/g,function(match,p1){
-let len = p1.length;
-return '_'.repeat(Math.max(len + 2,5));
-});
-}
-
-function answerify(text){
-return text.replace(/\((.*?)\)/g,'<span class=\"red\">$1</span>');
-}
-
-function lines(text,mode){
-return text.split('\n').map(line=>{
-
-if(line.trim()==='') return '<br>';
-
-let parts = line.split('\t');
-
-let ko = parts[1] ? parts[1].trim() : parts[0].trim();
-
-let cn = parts[2] ? parts[2].trim() : '';
-
-let result = (mode==='q') ? blankify(ko) : answerify(ko);
-
-let html = '<div class="line">'+result+'</div>';
-
-// 문제지에서만 중국어 표시
-if(mode==='q' && cn){
-html += '<div class="line" style="color:#666;font-size:12pt;margin-top:-8px;">'+cn+'</div>';
-}
-
-return html;
-
-}).join('');
-}
-
-function chineseWritingBlock(text){
-return text.split('\n').map(line=>{
-if(!line.trim()) return '';
-
-let parts = line.split('\t');
-
-let speaker = parts[0] ? parts[0].trim() : '';
-let cn = parts[2] ? parts[2].trim() : '';
-
-if(!cn) return '';
-
-return `
-<div style="margin-bottom:12px;">
-<div><b>${speaker}:</b> ${cn}</div>
-<div>______________________________</div>
-</div>
-`;
-}).join('');
-}
-  
-function makeHtml(){
-
-const title = document.getElementById('title').value || '대화문 생성기';
-const level = document.getElementById('level').value;
-
-const t1 = document.getElementById('text1').value;
-const t2 = document.getElementById('text2').value;
-
-// 문제 1 (초급/중급 공통)
-let q1 =
-`<h2>${title}</h2>
-<h3>1. 대화문을 듣고 빈칸에 알맞은 말을 쓰세요.</h3>
-<p>请听对话并填写空格。</p>
-${lines(t1,'q')}
-`;
-
-// 초급이면 문제 2 추가
-let q2 = '';
-
-if(level === '초급'){
-q2 =
-`<br><br>
-<h3>2. 들은 대화문의 표현과 구조를 참고하여 아래 중국어 대화를 한국어로 쓰세요。</h3>
-<p>请参考刚才听到的对话中的表达和句型把下面的中文对话写成韩语。</p>
-
-${chineseWritingBlock(t2)}
-`;
-}else{
-q2 =
-`<br><br>
-<h3>2. 방금 들은 대화문처럼 새로운 대화문을 만들어 보세요。</h3>
-<p>请参考刚才听到的对话，编写一个新的对话。</p>
-
-${lines(t1,'q')}
-`;
-}
-
-// 답지 (한국어만)
-let a1 =
-`<h2>답지</h2>
-<h3>1번 정답</h3>
-${lines(t1,'a')}
-`;
-
-let a2 = '';
-
-if(level === '초급'){
-a2 =
-`<br><br>
-<h3>2번 정답</h3>
-${lines(t2,'a')}
-`;
-}else{
-a2 =
-`<br><br>
-<h3>2번 정답</h3>
-${lines(t1,'a')}
-`;
-}
-
-return `
-<html>
-<head>
-<meta charset="UTF-8">
-<style>
-body{
-font-family:'Noto Sans KR',sans-serif;
-padding:1.27cm;
-font-size:10pt;
-line-height:1.5;
-}
-
-@page{
-size:A4;
-margin:1.27cm;
-}
-</style>
-</head>
-<body>
-${q1}
-${q2}
-<div style="page-break-before:always;"></div>
-${a1}
-${a2}
-</body>
-</html>
-`;
-}
-
-function downloadDocx(){
-const content = makeHtml();
-const blob = new Blob(
-['\ufeff', content],
-{ type: 'application/msword' }
-);
-
-const link = document.createElement('a');
-link.href = URL.createObjectURL(blob);
-
-const filename =
-(document.getElementById('title').value || '대화문 생성기') + '.doc';
-
-link.download = filename;
-document.body.appendChild(link);
-link.click();
-document.body.removeChild(link);
-}
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
