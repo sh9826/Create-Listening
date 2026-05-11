@@ -7,9 +7,7 @@ return text.replace(/[()]/g,'');
 }
 
 function parseLines(text,mode){
-
 return text.split('\n').map(line=>{
-
 if(!line.trim()) return '';
 
 let parts = line.split('\t');
@@ -31,11 +29,12 @@ return `${speaker} ${answerify(ko)}`;
 }
 
 return '';
-
 }).join('\n\n');
 }
 
 async function generate(){
+
+try{
 
 const title = document.getElementById('title').value.trim();
 const level = document.getElementById('level').value;
@@ -47,12 +46,28 @@ alert('제목 입력');
 return;
 }
 
-let path = level==='beginner'
+const path = level === 'beginner'
 ? 'templates/beginner.docx'
 : 'templates/intermediate.docx';
 
 const res = await fetch(path);
+
+if(!res.ok){
+alert('템플릿 파일 불러오기 실패');
+return;
+}
+
 const content = await res.arrayBuffer();
+
+if(typeof PizZip === 'undefined'){
+alert('PizZip 로딩 실패');
+return;
+}
+
+if(typeof window.docxtemplater === 'undefined'){
+alert('docxtemplater 로딩 실패');
+return;
+}
 
 const zip = new PizZip(content);
 const doc = new window.docxtemplater(zip,{
@@ -78,16 +93,22 @@ doc.render();
 
 console.log(error);
 
-if(error.properties && error.properties.errors){
-let msg = error.properties.errors
-.map(e => e.properties.explanation)
-.join('\n');
+let msg = '템플릿 태그 오류';
 
-alert('템플릿 오류:\n' + msg);
-}else{
-alert('오류 발생');
+if(error.properties){
+
+if(error.properties.explanation){
+msg += '\n' + error.properties.explanation;
 }
 
+if(error.properties.errors){
+msg += '\n' + error.properties.errors.map(e=>{
+return e.properties.explanation || JSON.stringify(e);
+}).join('\n');
+}
+}
+
+alert(msg);
 return;
 }
 
@@ -100,4 +121,10 @@ const link = document.createElement('a');
 link.href = URL.createObjectURL(out);
 link.download = title + '.docx';
 link.click();
+
+}catch(e){
+console.log(e);
+alert('오류: ' + e.message);
+}
+
 }
