@@ -1,6 +1,6 @@
 function boxify(text){
   return text.replace(/\((.*?)\)/g,(match,p1)=>{
-    return "_".repeat(Math.max(p1.length + 2,6));
+    return "_".repeat(Math.max(p1.length * 3, 25));
   });
 }
 
@@ -10,31 +10,36 @@ function answerify(text){
 
 function parseLines(text,mode){
 
-  return text.split("\n").map(line=>{
+return text.split("\n").map(line=>{
 
-    if(!line.trim()) return "";
+if(!line.trim()) return "";
 
-    const parts = line.split("\t");
+const parts = line.split("\t");
 
-    const speaker = parts[0] ? parts[0].trim() : "";
-    const ko = parts[1] ? parts[1].trim() : "";
-    const cn = parts[2] ? parts[2].trim() : "";
+const speaker = parts[0] ? parts[0].trim() + " : " : "";
+const ko = parts[1] ? parts[1].trim() : "";
+const cn = parts[2] ? parts[2].trim() : "";
 
-    if(mode==="q1"){
-      return `${speaker}  ${boxify(ko)}\n${cn}`;
-    }
+if(mode==="q1"){
+return `${speaker}${boxify(ko)}
 
-    if(mode==="q2"){
-      return `${speaker}  ${cn}\n________________________________`;
-    }
+${cn}`;
+}
 
-    if(mode==="a"){
-      return `${speaker}  ${answerify(ko)}`;
-    }
+if(mode==="q2"){
+return `${speaker}${cn}
 
-    return "";
 
-  }).join("\n\n");
+________________________________________________________________________________`;
+}
+
+if(mode==="a"){
+return `${speaker}${answerify(ko)}`;
+}
+
+return "";
+
+}).join("\n\n\n");
 }
 
 async function generate(){
