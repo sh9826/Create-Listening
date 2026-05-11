@@ -70,7 +70,7 @@ return;
 }
 
 const zip = new PizZip(content);
-const doc = new window.docxtemplater(zip,{
+const doc = new docxtemplater(zip,{
 paragraphLoop:true,
 linebreaks:true
 });
