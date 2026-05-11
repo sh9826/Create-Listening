@@ -21,12 +21,13 @@ const ko = parts[1] ? parts[1].trim() : "";
 const cn = parts[2] ? parts[2].trim() : "";
 
 if(mode==="q1"){
+// 1번 문제 = 기존 간격 유지
 return `${speaker}${boxify(ko)}
-
 ${cn}`;
 }
 
 if(mode==="q2"){
+// 2번 문제 = 위아래 여백 크게
 return `${speaker}${cn}
 
 
@@ -39,7 +40,7 @@ return `${speaker}${answerify(ko)}`;
 
 return "";
 
-}).join("\n\n\n");
+}).join(mode==="q2" ? "\n\n\n" : "\n\n");
 }
 
 async function generate(){
