@@ -66,7 +66,7 @@ ________________________________________________________________________________
 }
 
 if(mode==="a"){
-return `${speaker} ${answerify(ko)}`
+return `${speaker} ${answerify(ko)}`;
 
 return "";
 
