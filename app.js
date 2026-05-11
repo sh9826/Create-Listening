@@ -13,10 +13,10 @@ async function generate() {
 
     const zip = new PizZip(content);
 
-    const doc = new Docxtemplater(zip, {
-      paragraphLoop: true,
-      linebreaks: true
-    });
+    const doc = new window.docxtemplater(zip, {
+  paragraphLoop: true,
+  linebreaks: true
+});
 
     doc.render({
       TITLE: title,
