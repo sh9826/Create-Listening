@@ -16,7 +16,7 @@ if(!line.trim()) return "";
 
 const parts = line.split("\t");
 
-const speaker = parts[0] ? parts[0].trim() + " : " : "";
+const speaker = parts[0] ? "【" + parts[0].trim() + " :】 " : "";
 const ko = parts[1] ? parts[1].trim() : "";
 const cn = parts[2] ? parts[2].trim() : "";
 
