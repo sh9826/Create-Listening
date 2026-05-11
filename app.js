@@ -15,7 +15,8 @@ async function generate() {
 
     const doc = new window.docxtemplater(zip, {
   paragraphLoop: true,
-  linebreaks: true
+  linebreaks: true,
+  delimiters: { start: "{", end: "}" }
 });
 
     doc.render({
