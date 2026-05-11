@@ -8,6 +8,37 @@ function answerify(text){
   return text.replace(/[()]/g,"");
 }
 
+function parseRows(text, mode){
+  return text.split("\n").filter(line=>line.trim()).map(line=>{
+
+    const parts = line.split("\t");
+
+    const speaker = parts[0] ? parts[0].trim() + " : " : "";
+    const ko = parts[1] ? parts[1].trim() : "";
+    const cn = parts[2] ? parts[2].trim() : "";
+
+    if(mode==="q1"){
+      return {
+        speaker: speaker,
+        content: boxify(ko) + "\n" + cn
+      };
+    }
+
+    if(mode==="q2"){
+      return {
+        speaker: speaker,
+        content: cn + "\n\n________________________________________"
+      };
+    }
+
+    return {
+      speaker:"",
+      content:""
+    };
+
+  });
+}
+
 function parseLines(text,mode){
 
 return text.split("\n").map(line=>{
@@ -77,19 +108,8 @@ doc.render({
 
 TITLE:title,
 
-Q1:parseLines(text1,"q1"),
-
-Q2:
-level==="beginner"
-? parseLines(text2,"q2")
-:
-`새로운 대화문을 만들어 보세요.
-
-________________________________
-
-________________________________
-
-________________________________`,
+q1rows: parseRows(text1,"q1"),
+q2rows: parseRows(text2,"q2"),
 
 A1:parseLines(text1,"a"),
 
